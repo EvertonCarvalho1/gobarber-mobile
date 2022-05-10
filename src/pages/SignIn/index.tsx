@@ -14,11 +14,11 @@ const SignIn: React.FC = () => {
 
             <Title>Faça seu login</Title>
 
-            <Input />
+            <Input name="email" icon="mail" placeholder="E-mail" />
 
-            <Input />
+            <Input name="password" icon="lock" placeholder="Senha" />
 
-            <Button  onPress={() => {console.log('boa')}}>
+            <Button onPress={() => { console.log('boa') }}>
                 Entrar
             </Button>
         </Container>

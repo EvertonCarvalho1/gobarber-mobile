@@ -6,12 +6,12 @@ import { Container, TextInput } from './styles';
 interface InputProps extends TextInputProps {
     name: string;
     icon: string;
-}
+  }
 
-const Input: React.FC<InputProps> = () => {
+const Input: React.FC<InputProps> = ({ name, icon, ...rest }) => {
     return (
-        <Container>
-            <TextInput/>
+        <Container >
+            <TextInput placeholderTextColor='#666360' {...rest} />
         </Container>
     )
 };

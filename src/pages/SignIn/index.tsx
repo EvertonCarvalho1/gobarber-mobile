@@ -1,5 +1,5 @@
 import React from "react";
-import { Image } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, View, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 
 import logoImg from '../../assets/logo.png';
@@ -12,24 +12,39 @@ const SignIn: React.FC = () => {
     return (
 
         <>
-            <Container>
-                <Image source={logoImg} />
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+                style={{ flex: 1 }}
+                enabled
+            >
 
-                <Title>Faça seu login</Title>
+                <ScrollView
+                    contentContainerStyle={{ flex: 1 }}
+                    keyboardShouldPersistTaps='handled'
+                >
+                    <Container >
+                        <Image source={logoImg} />
 
-                <Input name="email" icon="mail" placeholder="E-mail" />
+                        <View>
+                            <Title>Faça seu login</Title>
+                        </View>
 
-                <Input name="password" icon="lock" placeholder="Senha" />
+                        <Input name="email" icon="mail" placeholder="E-mail" />
 
-                <Button onPress={() => { console.log('boa') }}>
-                    Entrar
-                </Button>
-                <ForgotPassword onPress={() => { }}>
-                    <ForgotPasswordText >
-                        Esqueci minha senha
-                    </ForgotPasswordText>
-                </ForgotPassword >
-            </Container>
+                        <Input name="password" icon="lock" placeholder="Senha" />
+
+                        <Button onPress={() => { console.log('boa') }}>
+                            Entrar
+                        </Button>
+                        <ForgotPassword onPress={() => { }}>
+                            <ForgotPasswordText >
+                                Esqueci minha senha
+                            </ForgotPasswordText>
+                        </ForgotPassword >
+                    </Container>
+                </ScrollView>
+            </KeyboardAvoidingView>
+            
             <CreateAccountButton onPress={() => { }}>
                 <Icon name='log-in' size={20} color='#ff9000' />
                 <CreateAccountButtonText>

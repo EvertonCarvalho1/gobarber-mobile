@@ -38,14 +38,14 @@ const SignUp: React.FC = () => {
                         <Input name="password" icon="lock" placeholder="Senha" />
 
                         <Button onPress={() => { console.log('boa') }}>
-                            Entrar
+                            Cadastrar
                         </Button>
 
                     </Container>
                 </ScrollView>
             </KeyboardAvoidingView>
 
-            <BackToSignIn onPress={() => {navigation.goBack() }}>
+            <BackToSignIn onPress={() => { navigation.goBack() }}>
                 <Icon name='arrow-left' size={20} color='#FFF' />
                 <BackToSignInText>
                     Voltar para login

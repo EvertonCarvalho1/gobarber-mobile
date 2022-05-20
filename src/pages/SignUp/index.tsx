@@ -40,7 +40,6 @@ const SignUp: React.FC = () => {
 
                             <Input name="password" icon="lock" placeholder="Senha" />
 
-
                             <Button onPress={() => formRef.current?.submitForm()}>
                                 Cadastrar
                             </Button>

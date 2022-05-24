@@ -24,6 +24,7 @@ interface AuthContextData {
     signIn(credentials: SignInCredentials): Promise<void>; //quando transformamos o metodo em async, ele retorna um Promise<void>
     signOut(): void;
     updateUser(user: User): void;
+    loading: boolean;
 };
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -31,6 +32,8 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 const AuthProvider: React.FC = ({ children }) => {
 
     const [data, setData] = useState<AuthState>({} as AuthState);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
 
@@ -41,6 +44,8 @@ const AuthProvider: React.FC = ({ children }) => {
             if (token && user) {
                 setData({ token: token, user: JSON.parse(user) })
             }
+
+            setLoading(false);
         }
         loadStorageData()
     }, [])
@@ -79,7 +84,13 @@ const AuthProvider: React.FC = ({ children }) => {
 
     //children => tudo que este componente receber como filho, vamos repassar depois pra algum lugar dentro do componente
     return (
-        <AuthContext.Provider value={{ user: data.user, signIn, signOut, updateUser }}>
+        <AuthContext.Provider value={{
+            user: data.user,
+            signIn,
+            signOut,
+            updateUser,
+            loading
+        }}>
             {/* passamos o children pra que todos os filhos do AuthProvider sejam repassados como filhos do AuthContext.Provider */}
             {children}
         </AuthContext.Provider>

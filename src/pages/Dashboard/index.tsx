@@ -1,10 +1,22 @@
 import React from "react";
-import { View } from 'react-native';
+import { View, Button } from 'react-native';
 
+import { useAuth } from '../../hooks/auth';
+
+import { Container, Header, HeaderTitle, UserName } from "./styles";
 
 const Dashboard: React.FC = () => {
+    const { signOut } = useAuth();
+
     return (
-        <View />
+        <Container>
+            <Header>
+                <HeaderTitle>
+                    Bem vindo, {'\n'}
+                    <UserName>Everton Carvalho</UserName>
+                </HeaderTitle>
+            </Header>
+        </Container>
     )
 }
 

@@ -15,6 +15,8 @@ import * as Yup from 'yup';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 
+import { useAuth } from '../../hooks/auth';
+
 import getValidationErrors from "../../utils/getValidationErrors";
 
 import Input from "../../components/Input";
@@ -38,8 +40,11 @@ interface SignInFormData {
 
 const SignIn: React.FC = () => {
     const formRef = useRef<FormHandles>(null);
-    const passwordInputRef = useRef<TextInput>(null)
+    const passwordInputRef = useRef<TextInput>(null);
+
     const navigation = useNavigation();
+
+    const { signIn } = useAuth();
 
     const handleSignIn = useCallback(async (data: SignInFormData) => {
         try {
@@ -55,12 +60,12 @@ const SignIn: React.FC = () => {
                 abortEarly: false,
             });
 
-            // await signIn({
-            //     email: data.email,
-            //     password: data.password,
-            // })
+            await signIn({
+                email: data.email,
+                password: data.password,
+            });
 
-            // history.push('/dashboard')
+            //history.push('/dashboard')
         } catch (err) {
             if (err instanceof Yup.ValidationError) {
                 console.log(err)
@@ -72,7 +77,7 @@ const SignIn: React.FC = () => {
 
             Alert.alert('Erro na autenticação', 'Ocorreu um erro ao fazer login');
         }
-    }, [])
+    }, [signIn])
     //toda variavel que é de fora do useCallback, deve ser inserida no array de dependencias do mesmo.
 
     return (

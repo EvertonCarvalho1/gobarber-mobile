@@ -28,7 +28,7 @@ const Dashboard: React.FC = () => {
 
                 <ProfileButton onPress={() => { navigateToProfile }}>
                     <UserAvatar source={{ uri: replaceLink }} />
-                </ProfileButton>
+                </ProfileButton> 
 
             </Header>
         </Container> 

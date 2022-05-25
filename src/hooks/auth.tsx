@@ -36,7 +36,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
 
     useEffect(() => {
-
+        //signOut()
         async function loadStorageData(): Promise<void> {
             const token = await AsyncStorage.getItem('@GoBarber:token');
             const user = await AsyncStorage.getItem('@GoBarber:user');

@@ -31,7 +31,7 @@ const Dashboard: React.FC = () => {
                 </ProfileButton>  
 
             </Header>
-        </Container> 
+        </Container>  
     )
 }
 

@@ -13,7 +13,7 @@ import {
     ProvidersList
 } from "./styles";
 
-interface Provider {
+export interface Provider {
     id: string;
     name: string;
     avatar_url: string;
@@ -52,7 +52,13 @@ const Dashboard: React.FC = () => {
                 </ProfileButton>
             </Header>
 
-            <ProvidersList /> 
+            <ProvidersList
+                data={providers}
+                keyExtractor={(provider) => provider.id}
+                renderItem={({ item }) => (
+                    <UserName>{item.name}</UserName>
+                )}
+            />
 
         </Container>
     )

@@ -1,13 +1,35 @@
 import { useNavigation } from "@react-navigation/native";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from '../../hooks/auth';
+import api from "../../services/api";
 
-import { Container, Header, HeaderTitle, UserName, ProfileButton, UserAvatar } from "./styles";
+import {
+    Container,
+    Header,
+    HeaderTitle,
+    UserName,
+    ProfileButton,
+    UserAvatar,
+    ProvidersList
+} from "./styles";
+
+interface Provider {
+    id: string;
+    name: string;
+    avatar_url: string;
+};
 
 const Dashboard: React.FC = () => {
-    const { signOut, user } = useAuth();
+    const [providers, setProviders] = useState<Provider[]>([]);
 
+    const { signOut, user } = useAuth();
     const navigation = useNavigation();
+
+    useEffect(() => {
+        api.get('providers').then(response => {
+            setProviders(response.data);
+        });
+    }, []);
 
     const navigateToProfile = useCallback(() => {
         navigation.navigate('Profile');
@@ -20,7 +42,6 @@ const Dashboard: React.FC = () => {
     return (
         <Container>
             <Header>
-
                 <HeaderTitle>
                     Bem vindo, {'\n'}
                     <UserName>{user.name}</UserName>
@@ -28,10 +49,12 @@ const Dashboard: React.FC = () => {
 
                 <ProfileButton onPress={() => { navigateToProfile }}>
                     <UserAvatar source={{ uri: replaceLink }} />
-                </ProfileButton>  
-
+                </ProfileButton>
             </Header>
-        </Container>  
+
+            <ProvidersList /> 
+
+        </Container>
     )
 }
 

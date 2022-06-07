@@ -70,19 +70,18 @@ const Input: React.RefForwardingComponent<InputRef, InputProps> = (
   }, [fieldName, registerField]);
 
   return (
-    <Container isFocused={isFocused} isErrored={!!error}>
-      <Icon name={icon} size={20} color={isFocused || isFilled ? '#ff9000' : '#666360'} />
+    <Container style={containerStyle} isFocused={isFocused} isErrored={!!error}>
+      <Icon isFilled={isFilled} isFocused={isFocused} name={icon} size={20} />
       <TextInput
         ref={inputElementRef}
         keyboardAppearance="dark"
-        placeholderTextColor='#666360'
         defaultValue={defaultValue}
-        onChangeText={(value) => {
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
+        onChangeText={value => {
           inputValueRef.current.value = value;
         }}
         {...rest}
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
       />
     </Container>
   );

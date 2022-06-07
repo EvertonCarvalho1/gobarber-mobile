@@ -1,67 +1,107 @@
-import { useNavigation } from "@react-navigation/native";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Feather';
+
+import { useTheme } from 'styled-components';
 import { useAuth } from '../../hooks/auth';
-import api from "../../services/api";
+import api from '../../services/api';
 
 import {
-    Container,
-    Header,
-    HeaderTitle,
-    UserName,
-    ProfileButton,
-    UserAvatar,
-    ProvidersList
-} from "./styles";
+  Container,
+  Header,
+  HeaderTitle,
+  UserName,
+  ProfileButton,
+  UserAvatar,
+  ProvidersList,
+  ProvidersListTitle,
+  ProviderContainer,
+  ProviderAvatar,
+  ProviderInfo,
+  ProviderName,
+  ProviderMeta,
+  ProviderMetaText,
+} from './styles';
 
 export interface Provider {
-    id: string;
-    name: string;
-    avatar_url: string;
-};
+  id: string;
+  name: string;
+  avatar_url: string;
+}
 
 const Dashboard: React.FC = () => {
-    const [providers, setProviders] = useState<Provider[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
 
-    const { signOut, user } = useAuth();
-    const navigation = useNavigation();
+  const { user } = useAuth();
+  const { navigate } = useNavigation();
+  const theme = useTheme();
 
-    useEffect(() => {
-        api.get('providers').then(response => {
-            setProviders(response.data);
-        });
-    }, []);
+  useEffect(() => {
+    api.get('/providers').then(response => {
+      setProviders(response.data);
+    });
+  }, []);
 
-    const navigateToProfile = useCallback(() => {
-        navigation.navigate('Profile');
-    }, [navigation]);
+  const navigateToProfile = useCallback(() => {
+    navigate('Profile');
+  }, [navigate]);
 
-    const replaceLink = useMemo(() => {
-        return user.avatar_url.replace('http://localhost:3333', 'http://192.168.15.89:3333');
-    }, [user]);
+  const navigateToCreateAppointment = useCallback(
+    (providerId: string) => {
+      navigate('CreateAppointment', { providerId });
+    },
+    [navigate],
+  );
 
-    return (
-        <Container>
-            <Header>
-                <HeaderTitle>
-                    Bem vindo, {'\n'}
-                    <UserName>{user.name}</UserName>
-                </HeaderTitle>
+  return (
+    <Container>
+      <Header>
+        <HeaderTitle>
+          Bem vindo,{'\n'}
+          <UserName>{user.name}</UserName>
+        </HeaderTitle>
 
-                <ProfileButton onPress={() => { navigateToProfile }}>
-                    <UserAvatar source={{ uri: replaceLink }} />
-                </ProfileButton>
-            </Header>
+        <ProfileButton onPress={navigateToProfile}>
+          <UserAvatar source={{ uri: user.avatar_url }} />
+        </ProfileButton>
+      </Header>
 
-            <ProvidersList
-                data={providers}
-                keyExtractor={(provider) => provider.id}
-                renderItem={({ item }) => (
-                    <UserName>{item.name}</UserName>
-                )}
+      <ProvidersList
+        data={providers}
+        keyExtractor={provider => provider.id}
+        ListHeaderComponent={
+          <ProvidersListTitle>Cabeleireiros</ProvidersListTitle>
+        }
+        renderItem={({ item: provider }) => (
+          <ProviderContainer
+            onPress={() => navigateToCreateAppointment(provider.id)}
+          >
+            <ProviderAvatar
+              source={{
+                uri:
+                  provider.avatar_url ||
+                  'https://api.adorable.io/avatars/72/abott@adorable.png',
+              }}
             />
 
-        </Container>
-    )
-}
+            <ProviderInfo>
+              <ProviderName>{provider.name}</ProviderName>
+
+              <ProviderMeta>
+                <Icon name="calendar" size={14} color={theme.colors.orange} />
+                <ProviderMetaText>Segunda à sexta</ProviderMetaText>
+              </ProviderMeta>
+
+              <ProviderMeta>
+                <Icon name="clock" size={14} color={theme.colors.orange} />
+                <ProviderMetaText>8h às 18h</ProviderMetaText>
+              </ProviderMeta>
+            </ProviderInfo>
+          </ProviderContainer>
+        )}
+      />
+    </Container>
+  );
+};
 
 export default Dashboard;

@@ -1,12 +1,20 @@
-import React, { createContext, useCallback, useState, useContext, useEffect } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useState,
+  useContext,
+  useEffect,
+} from 'react';
+
 import AsyncStorage from '@react-native-community/async-storage';
+
 import api from '../services/api';
 
 interface User {
   id: string;
-  avatar_url: string;
   name: string;
   email: string;
+  avatar_url: string;
 }
 
 interface AuthState {
@@ -21,45 +29,46 @@ interface SignInCredentials {
 
 interface AuthContextData {
   user: User;
-  signIn(credentials: SignInCredentials): Promise<void>; //quando transformamos o metodo em async, ele retorna um Promise<void>
-  signOut(): void;
-  updateUser(user: User): void;
   loading: boolean;
-};
+  signIn(credentials: SignInCredentials): Promise<void>;
+  updateUser(user: User): Promise<void>;
+  signOut(): void;
+}
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
-
   const [data, setData] = useState<AuthState>({} as AuthState);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
-    //signOut()
     async function loadStorageData(): Promise<void> {
-      const token = await AsyncStorage.getItem('@GoBarber:token');
-      const user = await AsyncStorage.getItem('@GoBarber:user');
+      const [token, user] = await AsyncStorage.multiGet([
+        '@GoBarber:token',
+        '@GoBarber:user',
+      ]);
 
-      if (token && user) {
-        api.defaults.headers.authorization = `Bearer ${token}`;
-        setData({ token: token, user: JSON.parse(user) })
+      if (token[1] && user[1]) {
+        api.defaults.headers.authorization = `Bearer ${token[1]}`;
+
+        setData({ token: token[1], user: JSON.parse(user[1]) });
       }
+
       setLoading(false);
     }
-    loadStorageData()
-  }, [])
+
+    loadStorageData();
+  }, []);
 
   const signIn = useCallback(async ({ email, password }) => {
-    const response = await api.post('sessions', {
-      email,
-      password
-    })
+    const reseponse = await api.post('sessions', { email, password });
 
-    const { token, user } = response.data;
+    const { token, user } = reseponse.data;
 
-    await AsyncStorage.setItem('@GoBarber:token', token);
-    await AsyncStorage.setItem('@GoBarber:user', JSON.stringify(user));
+    await AsyncStorage.multiSet([
+      ['@GoBarber:token', token],
+      ['@GoBarber:user', JSON.stringify(user)],
+    ]);
 
     api.defaults.headers.authorization = `Bearer ${token}`;
 
@@ -67,44 +76,40 @@ const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   const signOut = useCallback(async () => {
-    await AsyncStorage.removeItem('@GoBarber:token');
-    await AsyncStorage.removeItem('@GoBarber:user');
+    await AsyncStorage.multiRemove(['@GoBarber:user', '@GoBarber:token']);
 
     setData({} as AuthState);
-  }, [])
+  }, []);
 
-  const updateUser = useCallback(async (user: User) => {
-    await AsyncStorage.setItem('@GoBarber:user', JSON.stringify(user))
+  const updateUser = useCallback(
+    async (user: User) => {
+      await AsyncStorage.setItem('@GoBarber:user', JSON.stringify(user));
 
-    setData({
-      token: data.token,
-      user: user,
-    });
-  }, [setData, data.token]);
+      setData({
+        token: data.token,
+        user,
+      });
+    },
+    [setData, data.token],
+  );
 
-  //children => tudo que este componente receber como filho, vamos repassar depois pra algum lugar dentro do componente
   return (
-    <AuthContext.Provider value={{
-      user: data.user,
-      signIn,
-      signOut,
-      updateUser,
-      loading
-    }}>
-      {/* passamos o children pra que todos os filhos do AuthProvider sejam repassados como filhos do AuthContext.Provider */}
+    <AuthContext.Provider
+      value={{ user: data.user, loading, signIn, signOut, updateUser }}
+    >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 function useAuth(): AuthContextData {
   const context = useContext(AuthContext);
 
   if (!context) {
-    throw new Error('useAuth must be used within a AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
 
-  return context
+  return context;
 }
 
 export { AuthProvider, useAuth };
